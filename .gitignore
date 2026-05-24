@@ -1,0 +1,19 @@
+.DS_Store
+.swiftpm/
+.build/
+dist/
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+
+# Local diagnostics and captured browser sessions can contain cookies or tokens.
+*.har
+*.log
+
+# Local app credentials live outside the repository, but keep these patterns out too.
+credentials.json
+*.token
+*.secret
+.env
+.env.*
