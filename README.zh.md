@@ -6,6 +6,14 @@ DeepSeek Monitor 是一款原生 macOS 菜单栏与桌面应用，用于查看 D
 
 应用只会把登录凭据保存在用户自己的 Mac 上，不会内置任何 token、cookie 或 API key。
 
+## 截图
+
+![登录界面](assets/screenshots/login.png)
+![总览界面](assets/screenshots/overview.png)
+![用量统计](assets/screenshots/usage.png)
+![模型统计](assets/screenshots/models.png)
+![菜单栏摘要](assets/screenshots/menu-bar.png)
+
 ## 功能
 
 - 原生 SwiftUI 仪表板，可查看余额、用量、成本、模型汇总和日趋势

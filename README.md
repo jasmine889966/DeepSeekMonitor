@@ -6,6 +6,14 @@ DeepSeek Monitor is a native macOS menu bar and desktop app for viewing DeepSeek
 
 The app stores login credentials only on the user's Mac and does not include any bundled token, cookie, or API key.
 
+## Screenshots
+
+![Login screen](assets/screenshots/login.png)
+![Overview dashboard](assets/screenshots/overview.png)
+![Usage analytics](assets/screenshots/usage.png)
+![Model breakdown](assets/screenshots/models.png)
+![Menu bar summary](assets/screenshots/menu-bar.png)
+
 ## Features
 
 - Native SwiftUI dashboard for balance, usage, costs, model totals, and daily trends
