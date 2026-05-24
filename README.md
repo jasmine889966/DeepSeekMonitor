@@ -1,5 +1,7 @@
 # DeepSeek Monitor
 
+English | [中文](README.zh.md)
+
 DeepSeek Monitor is a native macOS menu bar and desktop app for viewing DeepSeek platform balance, token usage, model breakdowns, costs, and local alert thresholds.
 
 The app stores login credentials only on the user's Mac and does not include any bundled token, cookie, or API key.
