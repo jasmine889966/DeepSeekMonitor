@@ -12,6 +12,7 @@ The app stores login credentials only on the user's Mac and does not include any
 ![Overview dashboard](assets/screenshots/overview.png)
 ![Usage analytics](assets/screenshots/usage.png)
 ![Model breakdown](assets/screenshots/models.png)
+![Official service status](assets/screenshots/status.png)
 ![Menu bar summary](assets/screenshots/menu-bar.png)
 
 ## Features

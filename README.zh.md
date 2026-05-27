@@ -12,6 +12,7 @@ DeepSeek Monitor 是一款原生 macOS 菜单栏与桌面应用，用于查看 D
 ![总览界面](assets/screenshots/overview.png)
 ![用量统计](assets/screenshots/usage.png)
 ![模型统计](assets/screenshots/models.png)
+![官方服务状态](assets/screenshots/status.png)
 ![菜单栏摘要](assets/screenshots/menu-bar.png)
 
 ## 功能
