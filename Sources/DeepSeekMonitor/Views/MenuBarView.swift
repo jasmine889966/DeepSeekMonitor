@@ -4,7 +4,7 @@ struct MenuBarLabel: View {
     let store: MonitorStore
 
     var body: some View {
-        let icon = Image(nsImage: AppIconRenderer.image(tone: store.iconTone, size: 18))
+        let icon = Image(nsImage: AppIconRenderer.image(tone: store.statusBarIconTone, size: 18))
         if let account = store.snapshot?.account {
             Label {
                 Text(Formatters.money(account.balance, currency: account.currency))
@@ -53,6 +53,8 @@ struct MenuBarView: View {
                     .foregroundStyle(.secondary)
             }
 
+            MenuBarOfficialStatus(store: store)
+
             Divider()
 
             HStack {
@@ -79,6 +81,80 @@ struct MenuBarView: View {
             return store.l10n.updatedAt(date.formatted(date: .omitted, time: .shortened))
         }
         return store.l10n.notConnected
+    }
+}
+
+private struct MenuBarOfficialStatus: View {
+    let store: MonitorStore
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(statusColor)
+                    .frame(width: 8, height: 8)
+                Text(store.l10n.officialStatus)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(statusTitle)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(statusColor)
+            }
+
+            if let status = store.officialStatus {
+                ForEach(status.components) { component in
+                    HStack(spacing: 8) {
+                        Circle()
+                            .fill(component.currentHealth.menuBarColor)
+                            .frame(width: 6, height: 6)
+                        Text(component.name)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
+                        Spacer(minLength: 8)
+                        Text(component.uptime)
+                            .monospacedDigit()
+                            .foregroundStyle(.secondary)
+                    }
+                    .font(.caption)
+                }
+            } else {
+                Text(store.officialStatusErrorMessage ?? store.l10n.officialStatusLoading)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
+        }
+        .padding(10)
+        .background(Color.primary.opacity(0.045), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+        }
+    }
+
+    private var statusTitle: String {
+        store.officialStatus?.summary.title(language: store.language) ?? store.l10n.notConnected
+    }
+
+    private var statusColor: Color {
+        guard let summary = store.officialStatus?.summary else { return .secondary }
+        return summary.menuBarColor
+    }
+}
+
+private extension ServiceHealth {
+    var menuBarColor: Color {
+        switch self {
+        case .operational:
+            .green
+        case .degraded, .maintenance:
+            .yellow
+        case .outage:
+            .red
+        case .unknown:
+            .secondary
+        }
     }
 }
 

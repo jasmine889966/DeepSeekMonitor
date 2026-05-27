@@ -40,24 +40,13 @@ struct DeepSeekMonitorApp: App {
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    private var statusItem: NSStatusItem?
-
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
         configureDockIcon()
-        configureStatusItem()
     }
 
     private func configureDockIcon() {
         NSApp.applicationIconImage = AppIconRenderer.image(tone: .normal)
-    }
-
-    private func configureStatusItem() {
-        guard statusItem == nil else { return }
-        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        item.button?.image = AppIconRenderer.image(tone: .normal, size: 18)
-        item.button?.image?.isTemplate = false
-        statusItem = item
     }
 }

@@ -111,8 +111,85 @@ struct DeepSeekMonitorTests {
         #expect(second.0.isEmpty)
     }
 
-    private func fixture(_ name: String) throws -> Data {
-        let url = try #require(Bundle.module.url(forResource: name, withExtension: "json"))
+    @Test func parsesOfficialStatusPageComponents() throws {
+        let html = String(data: try fixture("status_page", extension: "html"), encoding: .utf8)!
+        let atom = try fixture("status_history", extension: "atom")
+        let incidents = try OfficialStatusParser.parseAtom(data: atom)
+        let status = try OfficialStatusParser.parseStatusPage(html: html, incidents: incidents)
+
+        #expect(status.components.count == 2)
+        #expect(status.components[0].name == "API 服务 (API Service)")
+        #expect(status.components[0].uptime == "99.90% uptime")
+        #expect(status.components[0].days.map(\.health) == [.operational, .degraded, .outage])
+        #expect(status.components[1].days[1].health == .degraded)
+    }
+
+    @Test func parsesOfficialStatusAtomIncidentsNewestFirst() throws {
+        let atom = try fixture("status_history", extension: "atom")
+        let incidents = try OfficialStatusParser.parseAtom(data: atom)
+
+        #expect(incidents.count == 2)
+        #expect(incidents[0].id == "urn:flashduty:change:6480608319287")
+        #expect(incidents[0].status == "resolved")
+        #expect(incidents[0].affectedComponents == ["API 服务 (API Service)", "网页对话服务 (Web Chat Service)"])
+        #expect(incidents[0].link?.absoluteString == "https://status.deepseek.com/incidents/6480608319287")
+    }
+
+    @MainActor
+    @Test func officialStatusRefreshFailureKeepsPreviousStatus() async throws {
+        let previous = OfficialServiceStatus(
+            summary: .operational,
+            summaryTitle: "Everything is running smoothly",
+            summaryDetail: "All systems are operating as expected.",
+            components: [
+                ServiceComponentStatus(
+                    name: "API 服务 (API Service)",
+                    uptime: "99.90% uptime",
+                    currentHealth: .operational,
+                    days: []
+                )
+            ],
+            incidents: [],
+            sourceURL: OfficialServiceStatus.sourceURL,
+            refreshedAt: Date()
+        )
+        let store = MonitorStore(
+            credentialStore: InMemoryCredentialStore(),
+            client: FailingDeepSeekClient(),
+            officialStatusClient: FailingOfficialStatusClient(),
+            notifier: NoopNotifier()
+        )
+        store.officialStatus = previous
+
+        await store.refreshNow()
+
+        #expect(store.officialStatus == previous)
+        #expect(store.officialStatusErrorMessage != nil)
+        #expect(store.authState == .unauthenticated)
+    }
+
+    private func fixture(_ name: String, extension fileExtension: String = "json") throws -> Data {
+        let url = try #require(Bundle.module.url(forResource: name, withExtension: fileExtension))
         return try Data(contentsOf: url)
     }
+}
+
+private struct FailingOfficialStatusClient: OfficialStatusFetching {
+    func fetchStatus() async throws -> OfficialServiceStatus {
+        throw OfficialStatusError.noComponents
+    }
+}
+
+private struct FailingDeepSeekClient: DeepSeekFetching {
+    func validateCurrentUser(session: DeepSeekSession) async throws -> CurrentUserDTO { throw DeepSeekClientError.missingToken }
+    func fetchClientSettings(session: DeepSeekSession, scope: String) async throws {}
+    func fetchClientSettings(session: DeepSeekSession, did: String) async throws {}
+    func fetchSummary(session: DeepSeekSession) async throws -> AccountSummary { throw DeepSeekClientError.missingToken }
+    func fetchUsage(session: DeepSeekSession, month: Int, year: Int) async throws -> UsageBreakdown { throw DeepSeekClientError.missingToken }
+    func fetchCosts(session: DeepSeekSession, month: Int, year: Int) async throws -> CostBreakdown { throw DeepSeekClientError.missingToken }
+}
+
+private struct NoopNotifier: UserNotifying {
+    func requestAuthorization() async {}
+    func notify(title: String, body: String) async {}
 }

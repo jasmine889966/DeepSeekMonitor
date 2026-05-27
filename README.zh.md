@@ -2,7 +2,7 @@
 
 [English](README.md) | 中文
 
-DeepSeek Monitor 是一款原生 macOS 菜单栏与桌面应用，用于查看 DeepSeek 平台余额、Token 用量、模型统计、成本和本地告警阈值。
+DeepSeek Monitor 是一款原生 macOS 菜单栏与桌面应用，用于查看 DeepSeek 平台余额、Token 用量、模型统计、成本、官方服务状态和本地告警阈值。
 
 应用只会把登录凭据保存在用户自己的 Mac 上，不会内置任何 token、cookie 或 API key。
 
@@ -17,7 +17,9 @@ DeepSeek Monitor 是一款原生 macOS 菜单栏与桌面应用，用于查看 D
 ## 功能
 
 - 原生 SwiftUI 仪表板，可查看余额、用量、成本、模型汇总和日趋势
-- 菜单栏摘要，方便快速查看
+- 菜单栏摘要，方便快速查看余额、用量和官方 API/Web Chat 健康状态
+- 官方 DeepSeek 服务状态页，使用 Apple 风格的 90 天状态条展示组件 uptime 和最近事件
+- 菜单栏图标会跟随官方服务状态变化：服务正常时为白色，检测到异常时为红色
 - 通过内嵌 WebView 捕获 DeepSeek 登录会话
 - 本地告警：低余额、成本阈值、每月 Token 阈值
 - 中英文界面文案

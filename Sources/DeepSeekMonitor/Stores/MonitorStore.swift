@@ -15,6 +15,7 @@ final class MonitorStore {
 
     private let credentialStore: CredentialStoring
     private let client: DeepSeekFetching
+    private let officialStatusClient: OfficialStatusFetching
     private let notifier: UserNotifying
     private let alertEvaluator = AlertEvaluator()
     private var currentSession: DeepSeekSession?
@@ -33,6 +34,9 @@ final class MonitorStore {
     var selectedSection: MonitorSection = .overview
     var isRefreshing = false
     var errorMessage: String?
+    var officialStatus: OfficialServiceStatus?
+    var officialStatusErrorMessage: String?
+    var officialStatusRefreshedAt: Date?
     var lastTokenPreview: String?
 
     private var balanceThresholdString: String
@@ -50,10 +54,12 @@ final class MonitorStore {
     init(
         credentialStore: CredentialStoring = CredentialStore(),
         client: DeepSeekFetching = DeepSeekClient(),
+        officialStatusClient: OfficialStatusFetching = OfficialStatusClient(),
         notifier: UserNotifying = NotificationService()
     ) {
         self.credentialStore = credentialStore
         self.client = client
+        self.officialStatusClient = officialStatusClient
         self.notifier = notifier
         let defaults = UserDefaults.standard
         balanceThresholdString = defaults.string(forKey: DefaultsKey.balanceThreshold) ?? "50"
@@ -111,6 +117,15 @@ final class MonitorStore {
         } else {
             return .muted
         }
+    }
+
+    var statusBarIconTone: AppIconTone {
+        guard let summary = officialStatus?.summary else { return .muted }
+        return summary == .operational ? .menuBarNormal : .danger
+    }
+
+    var menuBarStatusTitle: String {
+        officialStatus?.summary.title(language: language) ?? l10n.notConnected
     }
 
     var l10n: L10n {
@@ -224,6 +239,7 @@ final class MonitorStore {
         guard !isRefreshing else { return }
         isRefreshing = true
         defer { isRefreshing = false }
+        let officialStatusTask = Task { try await officialStatusClient.fetchStatus() }
         MonitorLogger.store.info("refresh begin")
         MonitorLogger.file("store", "refresh begin")
 
@@ -233,6 +249,7 @@ final class MonitorStore {
                 snapshot = nil
                 MonitorLogger.store.info("refresh skipped, no token")
                 MonitorLogger.file("store", "refresh skipped, no token")
+                await finishOfficialStatusRefresh(officialStatusTask)
                 return
             }
             let cookieHeader = try credentialStore.loadCookieHeader() ?? ""
@@ -300,6 +317,7 @@ final class MonitorStore {
             MonitorLogger.store.error("refresh failed: \(error.localizedDescription, privacy: .public)")
             MonitorLogger.file("store", "refresh failed: \(error.localizedDescription)")
         }
+        await finishOfficialStatusRefresh(officialStatusTask)
     }
 
     func logout() {
@@ -323,6 +341,22 @@ final class MonitorStore {
 
     func clearAlerts() {
         alerts.removeAll()
+    }
+
+    private func finishOfficialStatusRefresh(_ task: Task<OfficialServiceStatus, Error>) async {
+        do {
+            let status = try await task.value
+            officialStatus = status
+            officialStatusRefreshedAt = status.refreshedAt
+            officialStatusErrorMessage = nil
+            updateAppIcon()
+            MonitorLogger.store.info("official status loaded")
+            MonitorLogger.file("store", "official status loaded components=\(status.components.count) incidents=\(status.incidents.count)")
+        } catch {
+            officialStatusErrorMessage = error.localizedDescription
+            MonitorLogger.store.error("official status failed: \(error.localizedDescription, privacy: .public)")
+            MonitorLogger.file("store", "official status failed: \(error.localizedDescription)")
+        }
     }
 
     private func processAlerts(for snapshot: MonitorSnapshot) {

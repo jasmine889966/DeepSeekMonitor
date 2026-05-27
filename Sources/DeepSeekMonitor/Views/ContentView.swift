@@ -18,6 +18,8 @@ struct ContentView: View {
                     CostsView(store: store)
                 case .models:
                     ModelsView(store: store)
+                case .status:
+                    ServiceStatusView(store: store)
                 case .alerts:
                     AlertsView(store: store)
                 case .settings:

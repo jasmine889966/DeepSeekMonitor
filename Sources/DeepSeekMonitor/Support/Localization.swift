@@ -77,6 +77,17 @@ struct L10n {
     var noMetrics: String { language.isChinese ? "暂无数据" : "No metrics yet" }
     var noMetricsDetail: String { language.isChinese ? "登录并刷新后会加载 DeepSeek 平台数据。" : "Log in and refresh to load DeepSeek platform usage." }
     var alertHistory: String { language.isChinese ? "告警历史" : "Alert history" }
+    var officialStatus: String { language.isChinese ? "官方服务状态" : "Official service status" }
+    var officialStatusLoading: String { language.isChinese ? "正在加载 DeepSeek 官方状态。" : "Loading DeepSeek official status." }
+    var officialStatusUnavailable: String { language.isChinese ? "无法刷新官方状态" : "Official status unavailable" }
+    var officialStatusRefreshFailed: String { language.isChinese ? "无法刷新官方状态" : "Could not refresh official status" }
+    var openOfficialStatus: String { language.isChinese ? "打开官方状态页" : "Open Status Page" }
+    var allServicesOperating: String { language.isChinese ? "所有服务运行正常。" : "All services are operating as expected." }
+    var serviceOperational: String { language.isChinese ? "正常" : "Operational" }
+    var serviceDegraded: String { language.isChinese ? "性能下降" : "Degraded" }
+    var serviceOutage: String { language.isChinese ? "不可用" : "Outage" }
+    var recentIncidents: String { language.isChinese ? "最近事件" : "Recent incidents" }
+    var noRecentIncidents: String { language.isChinese ? "暂无最近事件" : "No recent incidents" }
     var clear: String { language.isChinese ? "清空" : "Clear" }
     var refreshSection: String { language.isChinese ? "刷新" : "Refresh" }
     var alertSection: String { language.isChinese ? "告警" : "Alerts" }

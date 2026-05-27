@@ -5,6 +5,7 @@ enum MonitorSection: String, CaseIterable, Identifiable {
     case usage
     case costs
     case models
+    case status
     case alerts
     case settings
 
@@ -20,6 +21,7 @@ enum MonitorSection: String, CaseIterable, Identifiable {
         case .usage: language.isChinese ? "用量" : "Usage"
         case .costs: language.isChinese ? "成本" : "Costs"
         case .models: language.isChinese ? "模型" : "Models"
+        case .status: language.isChinese ? "服务状态" : "Status"
         case .alerts: language.isChinese ? "告警" : "Alerts"
         case .settings: language.isChinese ? "设置" : "Settings"
         }
@@ -31,6 +33,7 @@ enum MonitorSection: String, CaseIterable, Identifiable {
         case .usage: "chart.xyaxis.line"
         case .costs: "yensign.circle"
         case .models: "square.stack.3d.up"
+        case .status: "checkmark.rectangle.stack"
         case .alerts: "bell.badge"
         case .settings: "gearshape"
         }
@@ -228,4 +231,81 @@ struct MonitorSnapshot: Equatable, Sendable {
     var usage: UsageBreakdown
     var costs: CostBreakdown
     var refreshedAt: Date
+}
+
+enum ServiceHealth: String, Codable, Equatable, Sendable {
+    case operational
+    case degraded
+    case outage
+    case maintenance
+    case unknown
+
+    init(colorHex: String) {
+        switch colorHex.lowercased() {
+        case "#22c55e", "#10b981", "#16a34a":
+            self = .operational
+        case "#eab308", "#f97316", "#f59e0b":
+            self = .degraded
+        case "#ef4444", "#dc2626":
+            self = .outage
+        default:
+            self = .unknown
+        }
+    }
+
+    var severity: Int {
+        switch self {
+        case .outage: 4
+        case .degraded: 3
+        case .maintenance: 2
+        case .unknown: 1
+        case .operational: 0
+        }
+    }
+
+    func title(language: AppLanguage) -> String {
+        switch self {
+        case .operational: language.isChinese ? "运行正常" : "Operational"
+        case .degraded: language.isChinese ? "性能下降" : "Degraded"
+        case .outage: language.isChinese ? "服务不可用" : "Outage"
+        case .maintenance: language.isChinese ? "维护中" : "Maintenance"
+        case .unknown: language.isChinese ? "未知" : "Unknown"
+        }
+    }
+}
+
+struct OfficialServiceStatus: Equatable, Sendable {
+    var summary: ServiceHealth
+    var summaryTitle: String
+    var summaryDetail: String
+    var components: [ServiceComponentStatus]
+    var incidents: [ServiceIncident]
+    var sourceURL: URL
+    var refreshedAt: Date
+
+    static let sourceURL = URL(string: "https://status.deepseek.com/")!
+}
+
+struct ServiceComponentStatus: Identifiable, Equatable, Sendable {
+    var id: String { name }
+    var name: String
+    var uptime: String
+    var currentHealth: ServiceHealth
+    var days: [ServiceStatusDay]
+}
+
+struct ServiceStatusDay: Identifiable, Equatable, Sendable {
+    var date: Date
+    var health: ServiceHealth
+
+    var id: Date { date }
+}
+
+struct ServiceIncident: Identifiable, Equatable, Sendable {
+    var id: String
+    var title: String
+    var link: URL?
+    var updatedAt: Date
+    var status: String
+    var affectedComponents: [String]
 }

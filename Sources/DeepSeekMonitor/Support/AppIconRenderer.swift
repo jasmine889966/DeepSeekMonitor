@@ -4,6 +4,7 @@ import Foundation
 enum AppIconTone {
     case muted
     case normal
+    case menuBarNormal
     case warning
     case danger
 }
@@ -21,9 +22,11 @@ enum AppIconRenderer {
         let color: NSColor
         switch tone {
         case .muted:
-            color = .tertiaryLabelColor
+            color = .secondaryLabelColor
         case .normal:
             color = .systemBlue
+        case .menuBarNormal:
+            color = .white
         case .warning:
             color = .systemOrange
         case .danger:

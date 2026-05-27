@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>DeepSeek</title>
+  <id>https://status.deepseek.com</id>
+  <updated>2026-05-24T15:23:06+08:00</updated>
+  <entry>
+    <title>DeepSeek 网页端/API 不可用（DeepSeek WEB/API Unavailable）</title>
+    <updated>2026-05-24T15:23:06+08:00</updated>
+    <id>urn:flashduty:change:6480608319287</id>
+    <link href="https://status.deepseek.com/incidents/6480608319287" rel="alternate"></link>
+    <summary type="html">&lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; resolved&lt;/p&gt;&lt;p&gt;The incident has been resolved.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Affected components:&lt;/strong&gt; API 服务 (API Service), 网页对话服务 (Web Chat Service)&lt;/p&gt;</summary>
+  </entry>
+  <entry>
+    <title>DeepSeek API Abnormal</title>
+    <updated>2026-04-22T19:26:32+08:00</updated>
+    <id>urn:flashduty:change:217516863100287</id>
+    <link href="https://status.deepseek.com/incidents/217516863100287" rel="alternate"></link>
+    <summary type="html">&lt;p&gt;&lt;strong&gt;Status:&lt;/strong&gt; resolved&lt;/p&gt;&lt;p&gt;This incident has been resolved.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Affected components:&lt;/strong&gt; API 服务 (API Service)&lt;/p&gt;</summary>
+  </entry>
+</feed>
