@@ -2,7 +2,7 @@
 
 English | [中文](README.zh.md)
 
-DeepSeek Monitor is a native macOS menu bar and desktop app for viewing DeepSeek platform balance, token usage, model breakdowns, costs, official service status, and local alert thresholds.
+DeepSeek Monitor is a native macOS menu bar and desktop app for viewing DeepSeek platform balance, today's spend, token usage, model breakdowns, costs, official service status, and local alert thresholds.
 
 The app stores login credentials only on the user's Mac and does not include any bundled token, cookie, or API key.
 
@@ -18,7 +18,9 @@ The app stores login credentials only on the user's Mac and does not include any
 ## Features
 
 - Native SwiftUI dashboard for balance, usage, costs, model totals, and daily trends
-- Menu bar summary for quick checks, including official API/Web Chat health
+- Dashboard overview cards for today's cost and today's token usage, alongside balance, monthly cost, requests, and total tokens
+- Menu bar summary for quick checks, including today's cost, today's tokens, balance, monthly spend, monthly tokens, and official API/Web Chat health
+- Card-based menu bar layout that keeps daily and monthly metrics easy to scan at a glance
 - Official DeepSeek service status page with Apple-style 90-day status bars, component uptime, and recent incidents
 - Menu bar icon reflects official service health: white when services are healthy and red when service issues are detected
 - DeepSeek login capture through an embedded web view

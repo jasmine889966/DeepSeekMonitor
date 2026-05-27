@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0 - 2026-05-27
+
+- Added today's cost to the overview dashboard and menu bar summary.
+- Added today's token usage to the menu bar title and paired it with today's cost for faster daily spend checks.
+- Redesigned the menu bar metrics into consistent rounded cards: daily cost/tokens, balance/monthly cost, and monthly total tokens.
+- Added a today helper for cost breakdowns and test coverage for date-based daily cost lookup.
+
 ## 1.10 - 2026-05-27
 
 - Added an official DeepSeek service status section with Apple-style 90-day component status bars.

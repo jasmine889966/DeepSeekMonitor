@@ -67,6 +67,20 @@ struct DeepSeekMonitorTests {
         #expect(usage.today?.tokenTotal == 12)
     }
 
+    @Test func costBreakdownFindsTodayMetric() {
+        let today = DailyMetric(date: Date(), models: [
+            ModelMetric(model: "deepseek-v4-pro", metrics: [
+                MetricValue(type: .promptCacheHitToken, amount: Decimal(string: "0.12")!),
+                MetricValue(type: .promptCacheMissToken, amount: Decimal(string: "0.34")!),
+                MetricValue(type: .responseToken, amount: Decimal(string: "0.56")!)
+            ])
+        ])
+        let yesterday = DailyMetric(date: Calendar.current.date(byAdding: .day, value: -1, to: Date())!, models: [])
+        let costs = CostBreakdown(month: 5, year: 2026, currency: "CNY", modelTotals: [], dailyTotals: [yesterday, today])
+
+        #expect(costs.today?.total == Decimal(string: "1.02")!)
+    }
+
     @Test func decodesUsageCostArrayPayload() throws {
         let data = try fixture("usage_cost")
         let envelope = try JSONDecoder().decode(APIEnvelope<[CostDTO]>.self, from: data)

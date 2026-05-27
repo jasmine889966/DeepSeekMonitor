@@ -53,6 +53,7 @@ struct L10n {
     var monthlyTokens: String { language.isChinese ? "本月 Token" : "Monthly tokens" }
     var costThisMonth: String { language.isChinese ? "本月费用趋势" : "Cost this month" }
     var tokenUsageThisMonth: String { language.isChinese ? "本月 Token 趋势" : "Token usage this month" }
+    var todayCost: String { language.isChinese ? "今日消费" : "Today's cost" }
     var todayTokens: String { language.isChinese ? "今日 Token" : "Today's tokens" }
     var todayNoUsage: String { language.isChinese ? "今日暂无用量" : "No usage today" }
     var byModel: String { language.isChinese ? "按模型" : "By model" }

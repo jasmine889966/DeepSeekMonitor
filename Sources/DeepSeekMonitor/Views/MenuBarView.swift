@@ -5,9 +5,9 @@ struct MenuBarLabel: View {
 
     var body: some View {
         let icon = Image(nsImage: AppIconRenderer.image(tone: store.statusBarIconTone, size: 18))
-        if let account = store.snapshot?.account {
+        if let snapshot = store.snapshot {
             Label {
-                Text(Formatters.money(account.balance, currency: account.currency))
+                Text(statusTitle(for: snapshot))
             } icon: {
                 icon
             }
@@ -19,6 +19,12 @@ struct MenuBarLabel: View {
             }
         }
     }
+
+    private func statusTitle(for snapshot: MonitorSnapshot) -> String {
+        let todayCost = snapshot.costs.today?.total ?? 0
+        let todayTokens = snapshot.usage.today?.tokenTotal ?? 0
+        return "\(store.l10n.todayCost) \(Formatters.money(todayCost, currency: snapshot.costs.currency)) · \(Formatters.abbreviatedDecimal(todayTokens)) Token"
+    }
 }
 
 struct MenuBarView: View {
@@ -26,7 +32,7 @@ struct MenuBarView: View {
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(store.l10n.appName)
@@ -45,8 +51,8 @@ struct MenuBarView: View {
                 .help(store.l10n.refresh)
             }
 
-            if let account = store.snapshot?.account {
-                MenuBarMetrics(snapshot: store.snapshot, account: account, l10n: store.l10n)
+            if let snapshot = store.snapshot {
+                MenuBarMetrics(snapshot: snapshot, l10n: store.l10n)
             } else {
                 Text(store.errorMessage ?? store.l10n.loginHint)
                     .font(.callout)
@@ -68,9 +74,10 @@ struct MenuBarView: View {
                     NSApp.terminate(nil)
                 }
             }
+            .padding(.top, 2)
         }
         .padding(16)
-        .frame(width: 360)
+        .frame(width: 372)
     }
 
     private var menuSubtitle: String {
@@ -88,17 +95,16 @@ private struct MenuBarOfficialStatus: View {
     let store: MonitorStore
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
                 Circle()
                     .fill(statusColor)
                     .frame(width: 8, height: 8)
                 Text(store.l10n.officialStatus)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.caption.weight(.semibold))
                 Spacer()
                 Text(statusTitle)
-                    .font(.caption.weight(.semibold))
+                    .font(.caption.weight(.bold))
                     .foregroundStyle(statusColor)
             }
 
@@ -116,7 +122,7 @@ private struct MenuBarOfficialStatus: View {
                             .monospacedDigit()
                             .foregroundStyle(.secondary)
                     }
-                    .font(.caption)
+                    .font(.caption.weight(.medium))
                 }
             } else {
                 Text(store.officialStatusErrorMessage ?? store.l10n.officialStatusLoading)
@@ -125,11 +131,11 @@ private struct MenuBarOfficialStatus: View {
                     .lineLimit(2)
             }
         }
-        .padding(10)
-        .background(Color.primary.opacity(0.045), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .padding(11)
+        .background(Color.primary.opacity(0.035), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .stroke(Color.primary.opacity(0.055), lineWidth: 1)
         }
     }
 
@@ -159,38 +165,66 @@ private extension ServiceHealth {
 }
 
 private struct MenuBarMetrics: View {
-    var snapshot: MonitorSnapshot?
-    var account: AccountSummary
+    var snapshot: MonitorSnapshot
     var l10n: L10n
 
     private var todayModels: [ModelMetric] {
-        (snapshot?.usage.today?.models ?? [])
+        (snapshot.usage.today?.models ?? [])
             .filter { $0.tokenTotal > 0 || $0.requestCount > 0 }
             .sorted { $0.tokenTotal > $1.tokenTotal }
     }
 
     private var todayTotal: Decimal {
-        snapshot?.usage.today?.tokenTotal ?? 0
+        snapshot.usage.today?.tokenTotal ?? 0
+    }
+
+    private var todayCost: Decimal {
+        snapshot.costs.today?.total ?? 0
     }
 
     private var monthlyTotal: Decimal {
-        snapshot?.usage.modelTotals.tokenTotal ?? Decimal(account.monthlyTokenUsage)
+        snapshot.usage.modelTotals.tokenTotal
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Grid(alignment: .leading, horizontalSpacing: 18, verticalSpacing: 8) {
-                metricRow(title: l10n.balance, value: Formatters.money(account.balance, currency: account.currency), emphasized: true)
-                metricRow(title: l10n.monthlyCost, value: Formatters.money(account.monthlyCost, currency: account.currency))
-                metricRow(title: l10n.monthlyTotalTokens, value: Formatters.compactDecimal(monthlyTotal))
-                metricRow(title: l10n.todayTokens, value: Formatters.compactDecimal(todayTotal), emphasized: true)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                MenuBarHighlightMetric(
+                    title: l10n.todayCost,
+                    value: Formatters.money(todayCost, currency: snapshot.costs.currency),
+                    systemImage: "yensign.circle"
+                )
+                MenuBarHighlightMetric(
+                    title: l10n.todayTokens,
+                    value: Formatters.compactDecimal(todayTotal),
+                    systemImage: "number.circle"
+                )
             }
-            .font(.callout)
 
-            VStack(alignment: .leading, spacing: 7) {
+            HStack(spacing: 10) {
+                MenuBarHighlightMetric(
+                    title: l10n.balance,
+                    value: Formatters.money(snapshot.account.balance, currency: snapshot.account.currency),
+                    systemImage: "creditcard"
+                )
+                MenuBarHighlightMetric(
+                    title: l10n.monthlyCost,
+                    value: Formatters.money(snapshot.account.monthlyCost, currency: snapshot.account.currency),
+                    systemImage: "yensign.arrow.circlepath"
+                )
+            }
+
+            MenuBarHighlightMetric(
+                title: l10n.monthlyTotalTokens,
+                value: Formatters.compactDecimal(monthlyTotal),
+                systemImage: "sum",
+                isWide: true
+            )
+
+            VStack(alignment: .leading, spacing: 6) {
                 HStack {
                     Text(l10n.byModel)
-                        .font(.caption)
+                        .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                     Spacer()
                 }
@@ -205,13 +239,12 @@ private struct MenuBarMetrics: View {
                             Text(model.model)
                                 .lineLimit(1)
                                 .truncationMode(.middle)
-                                .foregroundStyle(.secondary)
                             Spacer(minLength: 8)
                             Text(Formatters.compactDecimal(model.tokenTotal))
                                 .fontWeight(.semibold)
                                 .monospacedDigit()
                         }
-                        .font(.caption)
+                        .font(.caption.weight(.medium))
                     }
 
                     if todayModels.count > 4 {
@@ -222,29 +255,57 @@ private struct MenuBarMetrics: View {
                     }
                 }
             }
-            .padding(10)
-            .background(Color.primary.opacity(0.045), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .padding(11)
+            .background(Color.primary.opacity(0.035), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .stroke(Color.primary.opacity(0.06), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .stroke(Color.primary.opacity(0.055), lineWidth: 1)
             }
             .help(allModelsHelp)
         }
     }
 
-    private func metricRow(title: String, value: String, emphasized: Bool = false) -> some View {
-        GridRow {
-            Text(title)
-            Text(value)
-                .fontWeight(emphasized ? .semibold : .regular)
-                .monospacedDigit()
-        }
-    }
-
     private var allModelsHelp: String {
         guard !todayModels.isEmpty else { return l10n.todayNoUsage }
-        return todayModels
-            .map { "\($0.model)：\(Formatters.decimal($0.tokenTotal, fractionDigits: 0))" }
-            .joined(separator: "\n")
+        let metrics = [
+            "\(l10n.todayCost)：\(Formatters.money(todayCost, currency: snapshot.costs.currency))",
+            "\(l10n.todayTokens)：\(Formatters.decimal(todayTotal, fractionDigits: 0))"
+        ]
+        let models = todayModels.map { "\($0.model)：\(Formatters.decimal($0.tokenTotal, fractionDigits: 0))" }
+        return (metrics + models).joined(separator: "\n")
+    }
+}
+
+private struct MenuBarHighlightMetric: View {
+    var title: String
+    var value: String
+    var systemImage: String
+    var isWide = false
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: systemImage)
+                .font(.callout)
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(value)
+                    .font(.system(size: isWide ? 22 : 19, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 11)
+        .padding(.vertical, 10)
+        .background(Color.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .stroke(Color.primary.opacity(0.055), lineWidth: 1)
+        }
     }
 }

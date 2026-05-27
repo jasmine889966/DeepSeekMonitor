@@ -25,6 +25,18 @@ struct OverviewView: View {
                             tint: .orange
                         )
                         MetricTile(
+                            title: store.l10n.todayCost,
+                            value: Formatters.money(snapshot.costs.today?.total ?? 0, currency: snapshot.costs.currency),
+                            systemImage: "yensign.circle",
+                            tint: .pink
+                        )
+                        MetricTile(
+                            title: store.l10n.todayTokens,
+                            value: Formatters.compactDecimal(snapshot.usage.today?.tokenTotal ?? 0),
+                            systemImage: "number.circle",
+                            tint: .blue
+                        )
+                        MetricTile(
                             title: store.l10n.monthlyApiRequests,
                             value: Formatters.compactNumber(snapshot.usage.modelTotals.requestCount),
                             systemImage: "arrow.up.arrow.down.circle",
@@ -33,8 +45,8 @@ struct OverviewView: View {
                         MetricTile(
                             title: store.l10n.totalTokens,
                             value: Formatters.compactDecimal(snapshot.usage.modelTotals.tokenTotal),
-                            systemImage: "number.circle",
-                            tint: .blue
+                            systemImage: "sum",
+                            tint: .indigo
                         )
                     }
 
@@ -83,7 +95,7 @@ struct StatusStrip: View {
             if let snapshot = store.snapshot {
                 Divider()
                     .frame(height: 44)
-                TodayTokenSummary(snapshot: snapshot, l10n: store.l10n)
+                TodayUsageSummary(snapshot: snapshot, l10n: store.l10n)
                     .frame(maxWidth: .infinity, alignment: .leading)
             } else {
                 Spacer()
@@ -154,33 +166,37 @@ struct StatusStrip: View {
     }
 }
 
-struct TodayTokenSummary: View {
+struct TodayUsageSummary: View {
     var snapshot: MonitorSnapshot
     var l10n: L10n
 
-    private var today: DailyMetric? {
+    private var todayUsage: DailyMetric? {
         snapshot.usage.today
     }
 
+    private var todayCost: DailyMetric? {
+        snapshot.costs.today
+    }
+
     private var modelRows: [ModelMetric] {
-        (today?.models ?? [])
+        (todayUsage?.models ?? [])
             .filter { $0.tokenTotal > 0 || $0.requestCount > 0 }
             .sorted { $0.tokenTotal > $1.tokenTotal }
     }
 
     var body: some View {
         HStack(spacing: 14) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(l10n.todayTokens)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text(today.map { Formatters.compactDecimal($0.tokenTotal) } ?? "0")
-                    .font(.system(size: 24, weight: .semibold, design: .rounded))
-                    .monospacedDigit()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.75)
+            HStack(spacing: 16) {
+                TodayMetricValue(
+                    title: l10n.todayCost,
+                    value: Formatters.money(todayCost?.total ?? 0, currency: snapshot.costs.currency)
+                )
+                TodayMetricValue(
+                    title: l10n.todayTokens,
+                    value: todayUsage.map { Formatters.compactDecimal($0.tokenTotal) } ?? "0"
+                )
             }
-            .frame(width: 170, alignment: .leading)
+            .frame(width: 300, alignment: .leading)
 
             if modelRows.isEmpty {
                 Text(l10n.todayNoUsage)
@@ -210,9 +226,31 @@ struct TodayTokenSummary: View {
 
     private var allModelsHelp: String {
         guard !modelRows.isEmpty else { return l10n.todayNoUsage }
-        return modelRows
-            .map { "\($0.model)：\(Formatters.decimal($0.tokenTotal, fractionDigits: 0))" }
-            .joined(separator: "\n")
+        let metrics = [
+            "\(l10n.todayCost)：\(Formatters.money(todayCost?.total ?? 0, currency: snapshot.costs.currency))",
+            "\(l10n.todayTokens)：\(Formatters.decimal(todayUsage?.tokenTotal ?? 0, fractionDigits: 0))"
+        ]
+        let models = modelRows.map { "\($0.model)：\(Formatters.decimal($0.tokenTotal, fractionDigits: 0))" }
+        return (metrics + models).joined(separator: "\n")
+    }
+}
+
+private struct TodayMetricValue: View {
+    var title: String
+    var value: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.system(size: 24, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.68)
+        }
+        .frame(width: 142, alignment: .leading)
     }
 }
 

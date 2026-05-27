@@ -81,6 +81,11 @@ struct CostBreakdown: Equatable, Sendable {
     var modelTotals: [ModelMetric]
     var dailyTotals: [DailyMetric]
 
+    var today: DailyMetric? {
+        let calendar = Calendar.current
+        return dailyTotals.first { calendar.isDateInToday($0.date) }
+    }
+
     static let empty = CostBreakdown(month: 1, year: 2026, currency: "CNY", modelTotals: [], dailyTotals: [])
 }
 
