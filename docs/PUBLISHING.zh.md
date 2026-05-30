@@ -8,28 +8,35 @@
 gh auth login
 ```
 
-## 创建仓库并推送
+## 构建 Release 产物
+
+```sh
+./script/build_and_run.sh package
+ditto -c -k --keepParent dist/DeepSeekMonitor.app dist/DeepSeekMonitor-macOS-1.2.1.zip
+```
+
+## 推送提交和标签
 
 在仓库根目录执行：
 
 ```sh
-gh repo create DeepSeekMonitor --public --source=. --remote=origin --push
-git push origin v1.0.0
+git push origin main
+git push origin v1.2.1
 ```
 
 ## 创建 GitHub Release
 
 ```sh
-gh release create v1.0.0 \
-  dist/DeepSeekMonitor-macOS-1.0.0.zip \
-  --title "DeepSeek Monitor 1.0.0" \
+gh release create v1.2.1 \
+  dist/DeepSeekMonitor-macOS-1.2.1.zip \
+  --title "DeepSeek Monitor 1.2.1" \
   --notes-file CHANGELOG.md
 ```
 
 ## 当前 Release 产物
 
 ```text
-dist/DeepSeekMonitor-macOS-1.0.0.zip
+dist/DeepSeekMonitor-macOS-1.2.1.zip
 ```
 
 这个产物应该作为 GitHub Release 附件上传，不要提交进仓库。

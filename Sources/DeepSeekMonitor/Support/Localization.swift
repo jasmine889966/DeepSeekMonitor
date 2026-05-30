@@ -93,6 +93,11 @@ struct L10n {
     var refreshSection: String { language.isChinese ? "刷新" : "Refresh" }
     var alertSection: String { language.isChinese ? "告警" : "Alerts" }
     var settings: String { language.isChinese ? "设置" : "Settings" }
+    var appearance: String { language.isChinese ? "显示" : "Appearance" }
+    var menuBarMode: String { language.isChinese ? "状态栏模式" : "Menu bar mode" }
+    var menuBarModeDetail: String {
+        language.isChinese ? "开启后隐藏 Dock 图标，只从状态栏访问应用。" : "Hide the Dock icon and access the app from the menu bar."
+    }
     var account: String { language.isChinese ? "账户" : "Account" }
     var token: String { language.isChinese ? "令牌" : "Token" }
     var forgotLogin: String { language.isChinese ? "忘记登录" : "Forget login" }

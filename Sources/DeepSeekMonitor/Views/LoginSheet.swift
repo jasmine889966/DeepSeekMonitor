@@ -252,7 +252,7 @@ struct WebLoginView: NSViewRepresentable {
                 let session = DeepSeekSession(
                     token: token,
                     cookieHeader: cookieHeader,
-                    appVersion: "1.0.0",
+                    appVersion: "1.2.1",
                     acceptLanguage: self.acceptLanguage,
                     did: self.did
                 )
@@ -363,7 +363,7 @@ struct WebLoginView: NSViewRepresentable {
                     method: 'GET',
                     credentials: 'include',
                     cache: 'no-store',
-                    headers: { 'Accept': '*/*', 'x-app-version': '1.0.0' }
+                    headers: { 'Accept': '*/*', 'x-app-version': '1.2.1' }
                   });
                   const text = await response.text();
                   let payload = null;

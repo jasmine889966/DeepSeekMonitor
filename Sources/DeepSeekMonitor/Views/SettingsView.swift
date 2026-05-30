@@ -37,6 +37,17 @@ struct SettingsView: View {
                 )
             }
 
+            Section(store.l10n.appearance) {
+                Toggle(isOn: $store.hideDockIcon) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(store.l10n.menuBarMode)
+                        Text(store.l10n.menuBarModeDetail)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+
             Section(store.l10n.account) {
                 LabeledContent(store.l10n.token) {
                     Text(store.lastTokenPreview ?? store.l10n.notConnected)

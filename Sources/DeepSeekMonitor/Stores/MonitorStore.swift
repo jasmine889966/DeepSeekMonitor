@@ -20,12 +20,13 @@ final class MonitorStore {
     private let alertEvaluator = AlertEvaluator()
     private var currentSession: DeepSeekSession?
 
-    private enum DefaultsKey {
+    enum DefaultsKey {
         static let balanceThreshold = "balanceThreshold"
         static let monthlyCostThreshold = "monthlyCostThreshold"
         static let monthlyTokenThreshold = "monthlyTokenThreshold"
         static let refreshIntervalMinutes = "refreshIntervalMinutes"
         static let appLanguage = "appLanguage"
+        static let hideDockIcon = "hideDockIcon"
     }
 
     var authState: AuthState = .unknown
@@ -44,6 +45,7 @@ final class MonitorStore {
     private var monthlyTokenThreshold: Int
     private var refreshIntervalMinutes: Int
     private var appLanguageRaw: String
+    private var hidesDockIcon: Bool
 
     @ObservationIgnored
     private var refreshTask: Task<Void, Never>?
@@ -69,6 +71,7 @@ final class MonitorStore {
         let savedRefreshInterval = defaults.integer(forKey: DefaultsKey.refreshIntervalMinutes)
         refreshIntervalMinutes = savedRefreshInterval == 0 ? 15 : savedRefreshInterval
         appLanguageRaw = defaults.string(forKey: DefaultsKey.appLanguage) ?? AppLanguage.simplifiedChinese.rawValue
+        hidesDockIcon = defaults.bool(forKey: DefaultsKey.hideDockIcon)
     }
 
     var rule: AlertRule {
@@ -97,6 +100,15 @@ final class MonitorStore {
             get: { self.language },
             set: { self.language = $0 }
         )
+    }
+
+    var hideDockIcon: Bool {
+        get { hidesDockIcon }
+        set {
+            hidesDockIcon = newValue
+            UserDefaults.standard.set(newValue, forKey: DefaultsKey.hideDockIcon)
+            applyDockIconVisibility(activateWhenRegular: !newValue)
+        }
     }
 
     var alertProgress: Double {
@@ -395,5 +407,16 @@ final class MonitorStore {
 
     private func updateAppIcon() {
         NSApp.applicationIconImage = AppIconRenderer.image(tone: iconTone)
+    }
+
+    private func applyDockIconVisibility(activateWhenRegular: Bool) {
+        if hidesDockIcon {
+            NSApp.setActivationPolicy(.accessory)
+        } else {
+            NSApp.setActivationPolicy(.regular)
+            if activateWhenRegular {
+                NSApp.activate(ignoringOtherApps: true)
+            }
+        }
     }
 }

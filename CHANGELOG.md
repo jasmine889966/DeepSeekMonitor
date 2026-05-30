@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 - 2026-05-30
+
+- Added a menu bar mode setting that hides the Dock and app switcher icon while keeping the menu bar extra available.
+- Restored regular Dock behavior immediately when menu bar mode is turned off.
+- Updated release metadata and login capture app version to 1.2.1.
+
 ## 1.2.0 - 2026-05-27
 
 - Added today's cost to the overview dashboard and menu bar summary.

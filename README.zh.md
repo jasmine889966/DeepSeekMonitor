@@ -20,6 +20,7 @@ DeepSeek Monitor 是一款原生 macOS 菜单栏与桌面应用，用于查看 D
 - 原生 SwiftUI 仪表板，可查看余额、用量、成本、模型汇总和日趋势
 - 仪表板概览卡片新增今日消费和今日 Token，并继续展示余额、本月消费、请求数和总 Token
 - 菜单栏摘要可快速查看今日消费、今日 Token、余额、本月消费、本月 Token 和官方 API/Web Chat 健康状态
+- 可选“状态栏模式”，隐藏 Dock 和应用切换器图标，将应用作为轻量菜单栏小工具使用
 - 菜单栏弹窗采用统一的圆角卡片布局，日/月关键指标更容易扫读
 - 官方 DeepSeek 服务状态页，使用 Apple 风格的 90 天状态条展示组件 uptime 和最近事件
 - 菜单栏图标会跟随官方服务状态变化：服务正常时为白色，检测到异常时为红色
@@ -70,7 +71,7 @@ dist/DeepSeekMonitor.app
 打包完成后，可以生成适合上传到 GitHub Releases 的 zip：
 
 ```sh
-ditto -c -k --keepParent dist/DeepSeekMonitor.app dist/DeepSeekMonitor-macOS.zip
+ditto -c -k --keepParent dist/DeepSeekMonitor.app dist/DeepSeekMonitor-macOS-1.2.1.zip
 ```
 
 ## 隐私与凭据

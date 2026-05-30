@@ -20,6 +20,7 @@ The app stores login credentials only on the user's Mac and does not include any
 - Native SwiftUI dashboard for balance, usage, costs, model totals, and daily trends
 - Dashboard overview cards for today's cost and today's token usage, alongside balance, monthly cost, requests, and total tokens
 - Menu bar summary for quick checks, including today's cost, today's tokens, balance, monthly spend, monthly tokens, and official API/Web Chat health
+- Optional menu bar mode that hides the Dock and app switcher icon for a lightweight status-bar-only workflow
 - Card-based menu bar layout that keeps daily and monthly metrics easy to scan at a glance
 - Official DeepSeek service status page with Apple-style 90-day status bars, component uptime, and recent incidents
 - Menu bar icon reflects official service health: white when services are healthy and red when service issues are detected
@@ -70,7 +71,7 @@ dist/DeepSeekMonitor.app
 After packaging, create a zip suitable for GitHub Releases:
 
 ```sh
-ditto -c -k --keepParent dist/DeepSeekMonitor.app dist/DeepSeekMonitor-macOS.zip
+ditto -c -k --keepParent dist/DeepSeekMonitor.app dist/DeepSeekMonitor-macOS-1.2.1.zip
 ```
 
 ## Privacy And Credentials

@@ -31,7 +31,7 @@ protocol DeepSeekFetching: Sendable {
 struct DeepSeekSession: Sendable, Equatable {
     var token: String
     var cookieHeader: String
-    var appVersion: String = "1.0.0"
+    var appVersion: String = "1.2.1"
     var acceptLanguage: String = "zh-CN,zh-Hans;q=0.9"
     var did: String = ""
 

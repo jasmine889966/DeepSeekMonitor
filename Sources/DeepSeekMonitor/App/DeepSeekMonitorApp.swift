@@ -41,8 +41,12 @@ struct DeepSeekMonitorApp: App {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.setActivationPolicy(.regular)
-        NSApp.activate(ignoringOtherApps: true)
+        if UserDefaults.standard.bool(forKey: MonitorStore.DefaultsKey.hideDockIcon) {
+            NSApp.setActivationPolicy(.accessory)
+        } else {
+            NSApp.setActivationPolicy(.regular)
+            NSApp.activate(ignoringOtherApps: true)
+        }
         configureDockIcon()
     }
 
